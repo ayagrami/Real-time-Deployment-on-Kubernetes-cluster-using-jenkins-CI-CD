@@ -1,12 +1,19 @@
-FROM centos:latest
+FROM centos:stream8
 MAINTAINER ayagrami.15@gmail.com
-RUN yum install -y httpd \
-zip\
-unzip
-ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip /var/www/html/
+
+# Mise à jour des dépôts et installation des paquets nécessaires
+RUN sed -i 's|mirrorlist.centos.org|vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo && \
+    yum clean all && yum makecache && \
+    yum install -y httpd zip unzip && \
+    yum clean all
+
+# Téléchargement et extraction du fichier ZIP
 WORKDIR /var/www/html/
-RUN unzip photogenic.zip
-RUN cp -rvf photogenic/* .
-RUN rm -rf photogenic photogenic.zip
-CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+RUN curl -L -o photogenic.zip https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip && \
+    unzip photogenic.zip && \
+    cp -rvf photogenic/* . && \
+    rm -rf photogenic photogenic.zip
+
+# Exposition du port 80 et lancement d'Apache
 EXPOSE 80
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
