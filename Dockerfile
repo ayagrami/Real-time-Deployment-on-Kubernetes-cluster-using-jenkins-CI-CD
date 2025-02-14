@@ -1,19 +1,28 @@
-FROM centos:stream8
-MAINTAINER ayagrami.15@gmail.com
+# Utilisation de CentOS Stream 9
+FROM quay.io/centos/centos:stream9
 
-# Mise à jour des dépôts et installation des paquets nécessaires
-RUN sed -i 's|mirrorlist.centos.org|vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo && \
-    yum clean all && yum makecache && \
-    yum install -y httpd zip unzip && \
+# Ajout d'un label au lieu de MAINTAINER
+LABEL maintainer="ayagrami.15@gmail.com"
+
+# Mise à jour, installation des paquets nécessaires et nettoyage
+RUN yum install -y httpd zip unzip curl && \
     yum clean all
 
-# Téléchargement et extraction du fichier ZIP
+# Définition du répertoire de travail
 WORKDIR /var/www/html/
+
+# Téléchargement et extraction du fichier ZIP
 RUN curl -L -o photogenic.zip https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip && \
     unzip photogenic.zip && \
     cp -rvf photogenic/* . && \
     rm -rf photogenic photogenic.zip
 
-# Exposition du port 80 et lancement d'Apache
+# Exposition du port 80
 EXPOSE 80
+
+# Vérification de l'état du serveur Apache
+HEALTHCHECK --interval=30s --timeout=10s \
+    CMD curl -f http://localhost || exit 1
+
+# Lancement d'Apache
 CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
