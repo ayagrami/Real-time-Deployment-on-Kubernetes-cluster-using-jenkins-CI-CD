@@ -1,10 +1,10 @@
-FROM centos:latest
+FROM centos:7
 
 LABEL maintainer="ayagrami.15@gmail.com"
 
-# Install required packages using dnf (or yum for CentOS 7)
-RUN dnf install -y httpd zip unzip && \
-    dnf clean all
+# Install required packages using yum
+RUN yum install -y httpd zip unzip && \
+    yum clean all
 
 # Download and extract the website template
 ADD https://www.free-css.com/assets/files/free-css-templates/download/page254/photogenic.zip /var/www/html/
