@@ -2,7 +2,8 @@ FROM quay.io/centos/centos:stream9
 
 LABEL maintainer="ayagrami.15@gmail.com"
 
-RUN dnf install -y httpd zip unzip curl && \
+# Installation de paquets nécessaires avec la gestion des conflits
+RUN dnf install -y httpd zip unzip curl --allowerasing && \
     dnf clean all
 
 WORKDIR /var/www/html/
